@@ -1,0 +1,161 @@
+---
+title: "Stat 480: Factors"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+
+
+
+##  Factors in Data Frames
+
+
+Inspect the `fbi` object. How many variables are there? Which type does each of the variables have?
+
+```{r ncols, exercise=TRUE}
+data(fbi, package = "classdata")
+
+
+```
+
+```{r ncols-solution}
+ncol(fbi)
+str(fbi)
+```
+
+
+Make a summary of Year.
+
+```{r year, exercise=TRUE}
+data(fbi, package = "classdata")
+
+```
+
+```{r year-solution}
+summary(fbi$Year)
+```
+
+
+Make Year  a factor variable, then do a summary of Year. How is this different from the previous summary?
+
+```{r factor, exercise=TRUE}
+data(fbi, package = "classdata")
+
+```
+
+```{r factor-solution}
+fbi$Year <- factor(fbi$Year)
+summary(fbi$Year)
+```
+
+Are there other variables in the `fbi` data that should be factors (or vice versa)? 
+
+```{r fbi, exercise = TRUE}
+data(fbi, package = "classdata")
+fbi$Year <- factor(Year)
+str(fbi)
+```
+
+```{r fbi-solution}
+# Besides Year, Type is a factor variable
+# State and Abb could also be considered factors
+# Count and Population are observed variables.
+# Violent could be turned into a factor variable, but then we lose the logical information
+```
+
+
+
+## Reorder Factor Levels
+
+To answer the next questions, use the `fbi` object from the `classdata` package. 
+
+Introduce a rate of the number of reported offenses by population into the `fbi` data. You could use the *Ames standard* to make values comparable to a city of the size of Ames (population ~70,000). Plot boxplots of crime rates by different types of crime. How can you make axis text legible?
+
+```{r rate, exercise = TRUE}
+library(ggplot2)
+data(fbi, package="classdata")
+
+
+```
+
+```{r rate-solution}
+fbi$Rate <- fbi$Count/fbi$Population * 70000
+
+ggplot(data=fbi, aes(x = Type, y = Rate)) + geom_boxplot() +
+  coord_flip()
+```
+
+
+Reorder the boxplots of crime rates, such that the boxplots are ordered by their medians. 
+
+```{r reorder, exercise = TRUE}
+library(ggplot2)
+data(fbi, package="classdata")
+fbi$Rate <- fbi$Count/fbi$Population * 70000
+
+
+```
+
+```{r reorder-solution}
+ggplot(data=fbi, aes(x = reorder(Type, Rate, median, na.rm=TRUE),
+                     y = Rate)) + 
+  geom_boxplot() +
+  coord_flip()
+```
+
+
+For one type of crime (subset!) plot boxplots of rates by state, reorder boxplots by median crime rates</span>
+
+
+```{r subset, exercise = TRUE}
+library(ggplot2)
+library(dplyr)
+data(fbi, package="classdata")
+fbi$Rate <- fbi$Count/fbi$Population * 70000
+
+
+```
+
+```{r subset-solution}
+onetype <- filter(fbi, Type=="Burglary")
+ggplot(data=onetype, 
+       aes(x = reorder(State, Rate, median, na.rm=TRUE),
+           y = Rate)) + 
+  geom_boxplot() +
+  coord_flip()
+```
+
+
+
+## Changing Levels
+
+Check on the level names given for the type of crimes in the `fbi` data:
+
+```{r levels, exercise=TRUE}
+data(fbi, package="classdata")
+
+```
+
+```{r levels-solution}
+levels(fbi$Type)
+```
+
+
+Change the level for murders to `Murder`:
+
+```{r change, exercise=TRUE}
+data(fbi, package="classdata")
+
+```
+
+```{r change-solution}
+levels(fbi$Type)[6] <- "Murder"
+```
+
