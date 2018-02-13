@@ -159,3 +159,66 @@ data(fbi, package="classdata")
 levels(fbi$Type)[6] <- "Murder"
 ```
 
+## Visualizing factor variables
+
+
+For this exercise  use the `Titanic` object from the `classdata` package.
+
+
+Draw a barchart of Sex. Interpret.
+
+```{r gender, exercise=TRUE}
+data(Titanic, package="classdata")
+library(ggplot2)
+
+```
+
+```{r gender-solution}
+ggplot(data=Titanic, aes(x = Sex)) + geom_bar()
+# more men than women were on board the Titanic
+```
+
+
+Map survival to fill color in the barchart of Gender. Interpret.
+
+```{r survived, exercise=TRUE}
+data(Titanic, package="classdata")
+library(ggplot2)
+ggplot(data=Titanic, aes(x = Sex)) + geom_bar()
+
+```
+
+```{r survived-solution}
+ggplot(data=Titanic, aes(x = Sex, fill=Survived)) + geom_bar()
+# about as many men survived as women
+```
+
+In the previous barchart change the `position` parameter to `"fill"`. Interpret.
+
+```{r ratio, exercise=TRUE}
+data(Titanic, package="classdata")
+library(ggplot2)
+ggplot(data=Titanic, aes(x = Sex, fill=Survived)) + geom_bar()
+
+```
+
+```{r ratio-solution}
+ggplot(data=Titanic, aes(x = Sex, fill=Survived)) + geom_bar(position="fill")
+# the ratio of survival among women was much higher than among men.
+```
+
+
+Read up on the `position` parameter in `?geom_bar`. Try out other options for `position`. Interpret.
+
+```{r dodge, exercise=TRUE}
+data(Titanic, package="classdata")
+library(ggplot2)
+
+ggplot(data=Titanic, aes(x = Sex, fill=Survived)) + geom_bar()
+```
+
+```{r dodge-solution}
+ggplot(data=Titanic, aes(x = Sex, fill=Survived)) + geom_bar(position="dodge")
+# dodge places categories side by side. We can compare subgroups directly.
+```
+

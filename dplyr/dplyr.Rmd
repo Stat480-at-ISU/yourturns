@@ -1,0 +1,75 @@
+---
+title: "Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## dplyr example - 1
+
+For this set of exercises use the `french_fries` data from the `reshape2` package: `data(french_fries, package="reshape2")` 
+
+
+Do ratings of potato-y show a difference between the different oils over time?
+
+```{r one, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one-solution}
+library(dplyr)
+avgs.potato <- french_fries %>% group_by(time, treatment) %>% 
+  summarise(
+    m.potato = mean(potato, na.rm=TRUE)
+  )
+avgs.potato %>% head()
+
+```
+
+
+Draw a plot of the average potato-y rating by time, color by treatment.
+
+```{r two, exercise=TRUE}
+data(french_fries, package="reshape2")
+library(dplyr)
+avgs.potato <- french_fries %>% group_by(time, treatment) %>% 
+  summarise(
+    m.potato = mean(potato, na.rm=TRUE)
+  )
+
+```
+
+```{r two-solution}
+library(ggplot2)
+avgs.potato %>% 
+  ggplot(aes(x = time, y = m.potato, colour=treatment)) +
+  geom_point()
+# there is no apparent difference between the treatments
+```
+
+How does this plot look like for the rancid rating?
+
+```{r three, exercise=TRUE}
+data(french_fries, package="reshape2")
+library(dplyr)
+
+```
+
+```{r three-solution}
+library(ggplot2)
+avgs.rancid <- french_fries %>% group_by(time, treatment) %>% 
+  summarise(
+    m.rancid = mean(rancid, na.rm=TRUE)
+  )
+avgs.rancid %>% 
+  ggplot(aes(x = time, y = m.rancid, colour=treatment)) +
+  geom_point()
+
+```
+
