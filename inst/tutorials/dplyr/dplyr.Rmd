@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "Using the dplyr package at the example of the french fries data"
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -72,4 +72,119 @@ avgs.rancid %>%
   geom_point()
 
 ```
+
+## dplyr example - 2
+
+For this set of exercises use the `french_fries` data from the `reshape2` package: `data(french_fries, package="reshape2")` 
+
+
+How much consistency do we see between ratings? For buttery and rancid ratings find the mean and the absolute difference between the two replicates (for each subject, each treatment and each time point). Use `dplyr` functions to find this summary dataset.
+
+```{r one2, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one2-solution}
+library(dplyr)
+consistency <- french_fries %>% group_by(subject, time, treatment) %>% 
+  summarise(
+    mean.potato=mean(potato, na.rm=TRUE),
+    diff.potato = abs(max(potato, na.rm=TRUE)-min(potato, na.rm=TRUE)),
+    mean.rancid=mean(rancid, na.rm=TRUE),
+    diff.rancid = abs(max(rancid, na.rm=TRUE)-min(rancid, na.rm=TRUE))
+  )
+
+```
+
+Are ratings more different between the two scales? What would you need to draw a side-by-side boxplot of the two ratings? Describe in words.
+
+```{r one4, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one4-solution}
+# We cannot draw side-by-side boxplots of two different variables. We would need a different data format:
+
+consistency <- french_fries %>% group_by(subject, time, treatment) %>% 
+  summarise(
+    mean.potato=mean(potato, na.rm=TRUE),
+    diff.potato = abs(max(potato, na.rm=TRUE)-min(potato, na.rm=TRUE)),
+    mean.rancid=mean(rancid, na.rm=TRUE),
+    diff.rancid = abs(max(rancid, na.rm=TRUE)-min(rancid, na.rm=TRUE))
+  )
+sidebyside <- data.frame(
+  var = c(consistency$diff.potato, consistency$diff.rancid),
+  type=rep(c("potato", "rancid"), each=nrow(consistency))
+  )
+sidebyside %>% ggplot(aes(x = type, y = var)) + geom_boxplot()
+```
+
+
+Use the previous data set of average ratings and differences between ratings. Show the variability in the potato-y ratings by subjects. Order subjects from least variability to most:
+
+```{r one3, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one3-solution}
+library(dplyr)
+library(ggplot2)
+consistency <- french_fries %>% group_by(subject, time, treatment) %>% 
+  summarise(
+    mean.potato=mean(potato, na.rm=TRUE),
+    diff.potato = abs(max(potato, na.rm=TRUE)-min(potato, na.rm=TRUE)),
+    mean.rancid=mean(rancid, na.rm=TRUE),
+    diff.rancid = abs(max(rancid, na.rm=TRUE)-min(rancid, na.rm=TRUE))
+  )
+
+consistency %>% ungroup() %>% mutate(
+  subject = reorder(subject, diff.potato)
+) %>%
+  ggplot(aes(x = subject, y = diff.potato)) + geom_boxplot()
+```
+
+## dplyr example - 3
+
+
+For this set of exercises use the `french_fries` data from the `reshape2` package: `data(french_fries, package="reshape2")` 
+
+For each subject, determine how many records are missing (either absent or NA). 
+
+```{r one32, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one32-solution}
+library(dplyr)
+french_fries %>% group_by(subject) %>% 
+  summarise(
+   missing = 10*2*3*5-length(na.omit(c(buttery, rancid, potato, grassy, painty)))
+ ) %>% arrange(desc(missing))
+```
+
+
+Expand the above solution to identify the number of missing values by week. Plot the result.
+
+```{r one5, exercise=TRUE}
+data(french_fries, package="reshape2")
+
+```
+
+```{r one5-solution}
+library(dplyr)
+library(ggplot2)
+miss <- french_fries %>% group_by(subject, time) %>%
+  summarise(
+   missing = 2*3*5-length(na.omit(c(buttery, rancid, potato, grassy, painty)))
+ ) %>% arrange(desc(missing))
+
+miss %>% 
+  ggplot(aes(x = time, y = missing)) + geom_point() +
+  facet_wrap(~subject)
+```
+
 
